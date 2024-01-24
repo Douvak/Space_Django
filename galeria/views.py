@@ -1,17 +1,26 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from galeria.models import Fotografia
+from django.contrib import messages
 # Create your views here.
 
 
 def index(request):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Login Necessário!')
+        return redirect('login')
+    
     fotografias = Fotografia.objects.filter(publicado=True)
     return  render(request, 'galeria/index.html', {'cards': fotografias})
 
 def imagem(request, foto_id):
-
     fotografia = get_object_or_404(Fotografia, pk=foto_id)
     return render (request, 'galeria/imagem.html', {'fotografia' : fotografia})
+
 def buscar(request):
+    if not request.user.is_authenticated:
+        messages.error(request, 'Login Necessário!')
+        return redirect('login')
+    
     fotografias = Fotografia.objects.filter(publicado=True)
     if 'buscar' in request.GET:
         nome_a_buscar = request.GET['buscar']
